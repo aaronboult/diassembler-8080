@@ -20,7 +20,7 @@ for i in range(len(data)):
 
     if data[i][2] == "1":
 
-        output += f"{data[i][0]} => write_buffer.write_fmt(format_args!(\"{data[i][1]}\\n\")).expect(\"Failed to write to file\"),\n"
+        output += f"{data[i][0]} => write_buffer.write_fmt(format_args!(\"{{:06x}} {data[i][1]}\\n\", program_counter)).expect(\"Failed to write to file\"),\n"
     
     else:
 
@@ -28,11 +28,11 @@ for i in range(len(data)):
 
         if data[i][2] == "2":
 
-            println = data[i][1].replace(lastRegister, "{:02x}") + "\\n\", buffer[pc + 1]"
+            println = "{:06x} " + data[i][1].replace(lastRegister, "{:02x}") + "\\n\", program_counter, buffer[program_counter + 1]"
         
         else:
 
-            println = data[i][1].replace(lastRegister, "{:02x} {:02x}")
+            println = "{:06x} " + data[i][1].replace(lastRegister, "{:02x} {:02x}")
 
             if len(data[i]) == 4:
 
@@ -40,15 +40,15 @@ for i in range(len(data)):
 
                 if opcodeLocs.index("byte2") < opcodeLocs.index("byte3"): # If byte2 comes before byte3
 
-                    println += "\\n\", buffer[pc + 1], buffer[pc + 2]"
+                    println += "\\n\", program_counter, buffer[program_counter + 1], buffer[program_counter + 2]"
                 
                 else:
 
-                    println += "\\n\", buffer[pc + 2], buffer[pc + 1]"
+                    println += "\\n\", program_counter, buffer[program_counter + 2], buffer[program_counter + 1]"
             
             else:
 
-                println += "\\n\", buffer[pc + 1], buffer[pc + 2]"
+                println += "\\n\", program_counter, buffer[program_counter + 2], buffer[program_counter + 1]"
 
         output += f"{data[i][0]} => {{\n\twrite_buffer.write_fmt(format_args!(\"{println})).expect(\"Failed to write to file\");\n\tread_bytes = {int(data[i][2])};\n}},\n"
 
