@@ -9,30 +9,35 @@ fn main() {
     let mut buffer = vec![];
 
     for _ in 0..file.metadata().expect("Failed to read file").len(){
+
         buffer.push(0);
-    }
+
+    } // Initialize the buffer, inflating it to the size of the file
 
     file.read_exact(&mut buffer).expect("Failed to read file");
 
-    let mut program_counter = 0usize;
+    let mut program_counter = 0;
 
     let mut file_writer = BufWriter::new(File::create("disassembled.txt").expect("Unable to create file"));
     
     while program_counter < buffer.len(){
-        let bytes_read = check_opcode_8080(&program_counter, &buffer, &mut file_writer);
+
+        let bytes_read = check_opcode_8080(program_counter, &buffer, &mut file_writer);
+
         program_counter = program_counter + bytes_read;
+
     }
 
 }
 
-fn check_opcode_8080(pc: &usize, buffer: &Vec<u8>, write_buffer: &mut BufWriter<File>) -> usize {
+fn check_opcode_8080(program_counter: usize, buffer: &Vec<u8>, write_buffer: &mut BufWriter<File>) -> usize {
     
     let mut read_bytes = 1;
     
-    match buffer[*pc] {
+    match buffer[program_counter] {
         0 => write_buffer.write_fmt(format_args!("NOP\n")).expect("Failed to write to file"),
         1 => {
-            write_buffer.write_fmt(format_args!("LXI B {:02x} {:02x}\n", buffer[pc + 2], buffer[pc + 1])).expect("Failed to write to file");
+            write_buffer.write_fmt(format_args!("LXI B {:02x} {:02x}\n", buffer[program_counter + 2], buffer[program_counter + 1])).expect("Failed to write to file");
             read_bytes = 3;
         },
         2 => write_buffer.write_fmt(format_args!("STAX B\n")).expect("Failed to write to file"),
@@ -40,7 +45,7 @@ fn check_opcode_8080(pc: &usize, buffer: &Vec<u8>, write_buffer: &mut BufWriter<
         4 => write_buffer.write_fmt(format_args!("INR B\n")).expect("Failed to write to file"),
         5 => write_buffer.write_fmt(format_args!("DCR B\n")).expect("Failed to write to file"),
         6 => {
-            write_buffer.write_fmt(format_args!("MVI B  {:02x}\n", buffer[pc + 1])).expect("Failed to write to file");
+            write_buffer.write_fmt(format_args!("MVI B  {:02x}\n", buffer[program_counter + 1])).expect("Failed to write to file");
             read_bytes = 2;
         },
         7 => write_buffer.write_fmt(format_args!("RLC\n")).expect("Failed to write to file"),
@@ -50,12 +55,12 @@ fn check_opcode_8080(pc: &usize, buffer: &Vec<u8>, write_buffer: &mut BufWriter<
         12 => write_buffer.write_fmt(format_args!("INR C\n")).expect("Failed to write to file"),
         13 => write_buffer.write_fmt(format_args!("DCR C\n")).expect("Failed to write to file"),
         14 => {
-            write_buffer.write_fmt(format_args!("MVI C {:02x}\n", buffer[pc + 1])).expect("Failed to write to file");
+            write_buffer.write_fmt(format_args!("MVI C {:02x}\n", buffer[program_counter + 1])).expect("Failed to write to file");
             read_bytes = 2;
         },
         15 => write_buffer.write_fmt(format_args!("RRC\n")).expect("Failed to write to file"),
         17 => {
-            write_buffer.write_fmt(format_args!("LXI D {:02x} {:02x}\n", buffer[pc + 2], buffer[pc + 1])).expect("Failed to write to file");
+            write_buffer.write_fmt(format_args!("LXI D {:02x} {:02x}\n", buffer[program_counter + 2], buffer[program_counter + 1])).expect("Failed to write to file");
             read_bytes = 3;
         },
         18 => write_buffer.write_fmt(format_args!("STAX D\n")).expect("Failed to write to file"),
@@ -63,7 +68,7 @@ fn check_opcode_8080(pc: &usize, buffer: &Vec<u8>, write_buffer: &mut BufWriter<
         20 => write_buffer.write_fmt(format_args!("INR D\n")).expect("Failed to write to file"),
         21 => write_buffer.write_fmt(format_args!("DCR D\n")).expect("Failed to write to file"),
         22 => {
-            write_buffer.write_fmt(format_args!("MVI D  {:02x}\n", buffer[pc + 1])).expect("Failed to write to file");
+            write_buffer.write_fmt(format_args!("MVI D  {:02x}\n", buffer[program_counter + 1])).expect("Failed to write to file");
             read_bytes = 2;
         },
         23 => write_buffer.write_fmt(format_args!("RAL\n")).expect("Failed to write to file"),
@@ -73,65 +78,65 @@ fn check_opcode_8080(pc: &usize, buffer: &Vec<u8>, write_buffer: &mut BufWriter<
         28 => write_buffer.write_fmt(format_args!("INR E\n")).expect("Failed to write to file"),
         29 => write_buffer.write_fmt(format_args!("DCR E\n")).expect("Failed to write to file"),
         30 => {
-            write_buffer.write_fmt(format_args!("MVI E {:02x}\n", buffer[pc + 1])).expect("Failed to write to file");
+            write_buffer.write_fmt(format_args!("MVI E {:02x}\n", buffer[program_counter + 1])).expect("Failed to write to file");
             read_bytes = 2;
         },
         31 => write_buffer.write_fmt(format_args!("RAR\n")).expect("Failed to write to file"),
         33 => {
-            write_buffer.write_fmt(format_args!("LXI H {:02x} {:02x}\n", buffer[pc + 2], buffer[pc + 1])).expect("Failed to write to file");
+            write_buffer.write_fmt(format_args!("LXI H {:02x} {:02x}\n", buffer[program_counter + 2], buffer[program_counter + 1])).expect("Failed to write to file");
             read_bytes = 3;
         },
         34 => {
-            write_buffer.write_fmt(format_args!("SHLD {:02x} {:02x}\n", buffer[pc + 1], buffer[pc + 2])).expect("Failed to write to file");
+            write_buffer.write_fmt(format_args!("SHLD {:02x} {:02x}\n", buffer[program_counter + 1], buffer[program_counter + 2])).expect("Failed to write to file");
             read_bytes = 3;
         },
         35 => write_buffer.write_fmt(format_args!("INX H\n")).expect("Failed to write to file"),
         36 => write_buffer.write_fmt(format_args!("INR H\n")).expect("Failed to write to file"),
         37 => write_buffer.write_fmt(format_args!("DCR H\n")).expect("Failed to write to file"),
         38 => {
-            write_buffer.write_fmt(format_args!("MVI H {:02x}\n", buffer[pc + 1])).expect("Failed to write to file");
+            write_buffer.write_fmt(format_args!("MVI H {:02x}\n", buffer[program_counter + 1])).expect("Failed to write to file");
             read_bytes = 2;
         },
         39 => write_buffer.write_fmt(format_args!("DAA\n")).expect("Failed to write to file"),
         41 => write_buffer.write_fmt(format_args!("DAD H\n")).expect("Failed to write to file"),
         42 => {
-            write_buffer.write_fmt(format_args!("LHLD {:02x} {:02x}\n", buffer[pc + 1], buffer[pc + 2])).expect("Failed to write to file");
+            write_buffer.write_fmt(format_args!("LHLD {:02x} {:02x}\n", buffer[program_counter + 1], buffer[program_counter + 2])).expect("Failed to write to file");
             read_bytes = 3;
         },
         43 => write_buffer.write_fmt(format_args!("DCX H\n")).expect("Failed to write to file"),
         44 => write_buffer.write_fmt(format_args!("INR L\n")).expect("Failed to write to file"),
         45 => write_buffer.write_fmt(format_args!("DCR L\n")).expect("Failed to write to file"),
         46 => {
-            write_buffer.write_fmt(format_args!("MVI L  {:02x}\n", buffer[pc + 1])).expect("Failed to write to file");
+            write_buffer.write_fmt(format_args!("MVI L  {:02x}\n", buffer[program_counter + 1])).expect("Failed to write to file");
             read_bytes = 2;
         },
         47 => write_buffer.write_fmt(format_args!("CMA\n")).expect("Failed to write to file"),
         49 => {
-            write_buffer.write_fmt(format_args!("LXI SP  {:02x} {:02x}\n", buffer[pc + 2], buffer[pc + 1])).expect("Failed to write to file");
+            write_buffer.write_fmt(format_args!("LXI SP  {:02x} {:02x}\n", buffer[program_counter + 2], buffer[program_counter + 1])).expect("Failed to write to file");
             read_bytes = 3;
         },
         50 => {
-            write_buffer.write_fmt(format_args!("STA {:02x} {:02x}\n", buffer[pc + 1], buffer[pc + 2])).expect("Failed to write to file");
+            write_buffer.write_fmt(format_args!("STA {:02x} {:02x}\n", buffer[program_counter + 1], buffer[program_counter + 2])).expect("Failed to write to file");
             read_bytes = 3;
         },
         51 => write_buffer.write_fmt(format_args!("INX SP\n")).expect("Failed to write to file"),
         52 => write_buffer.write_fmt(format_args!("INR M\n")).expect("Failed to write to file"),
         53 => write_buffer.write_fmt(format_args!("DCR M\n")).expect("Failed to write to file"),
         54 => {
-            write_buffer.write_fmt(format_args!("MVI M {:02x}\n", buffer[pc + 1])).expect("Failed to write to file");
+            write_buffer.write_fmt(format_args!("MVI M {:02x}\n", buffer[program_counter + 1])).expect("Failed to write to file");
             read_bytes = 2;
         },
         55 => write_buffer.write_fmt(format_args!("STC\n")).expect("Failed to write to file"),
         57 => write_buffer.write_fmt(format_args!("DAD SP\n")).expect("Failed to write to file"),
         58 => {
-            write_buffer.write_fmt(format_args!("LDA {:02x} {:02x}\n", buffer[pc + 1], buffer[pc + 2])).expect("Failed to write to file");
+            write_buffer.write_fmt(format_args!("LDA {:02x} {:02x}\n", buffer[program_counter + 1], buffer[program_counter + 2])).expect("Failed to write to file");
             read_bytes = 3;
         },
         59 => write_buffer.write_fmt(format_args!("DCX SP\n")).expect("Failed to write to file"),
         60 => write_buffer.write_fmt(format_args!("INR A\n")).expect("Failed to write to file"),
         61 => write_buffer.write_fmt(format_args!("DCR A\n")).expect("Failed to write to file"),
         62 => {
-            write_buffer.write_fmt(format_args!("MVI A {:02x}\n", buffer[pc + 1])).expect("Failed to write to file");
+            write_buffer.write_fmt(format_args!("MVI A {:02x}\n", buffer[program_counter + 1])).expect("Failed to write to file");
             read_bytes = 2;
         },
         63 => write_buffer.write_fmt(format_args!("CMC\n")).expect("Failed to write to file"),
@@ -266,143 +271,143 @@ fn check_opcode_8080(pc: &usize, buffer: &Vec<u8>, write_buffer: &mut BufWriter<
         192 => write_buffer.write_fmt(format_args!("RNZ\n")).expect("Failed to write to file"),
         193 => write_buffer.write_fmt(format_args!("POP B\n")).expect("Failed to write to file"),
         194 => {
-            write_buffer.write_fmt(format_args!("JNZ {:02x} {:02x}\n", buffer[pc + 1], buffer[pc + 2])).expect("Failed to write to file");
+            write_buffer.write_fmt(format_args!("JNZ {:02x} {:02x}\n", buffer[program_counter + 1], buffer[program_counter + 2])).expect("Failed to write to file");
             read_bytes = 3;
         },
         195 => {
-            write_buffer.write_fmt(format_args!("JMP {:02x} {:02x}\n", buffer[pc + 1], buffer[pc + 2])).expect("Failed to write to file");
+            write_buffer.write_fmt(format_args!("JMP {:02x} {:02x}\n", buffer[program_counter + 1], buffer[program_counter + 2])).expect("Failed to write to file");
             read_bytes = 3;
         },
         196 => {
-            write_buffer.write_fmt(format_args!("CNZ {:02x} {:02x}\n", buffer[pc + 1], buffer[pc + 2])).expect("Failed to write to file");
+            write_buffer.write_fmt(format_args!("CNZ {:02x} {:02x}\n", buffer[program_counter + 1], buffer[program_counter + 2])).expect("Failed to write to file");
             read_bytes = 3;
         },
         197 => write_buffer.write_fmt(format_args!("PUSH B\n")).expect("Failed to write to file"),
         198 => {
-            write_buffer.write_fmt(format_args!("ADI {:02x}\n", buffer[pc + 1])).expect("Failed to write to file");
+            write_buffer.write_fmt(format_args!("ADI {:02x}\n", buffer[program_counter + 1])).expect("Failed to write to file");
             read_bytes = 2;
         },
         199 => write_buffer.write_fmt(format_args!("RST 0\n")).expect("Failed to write to file"),
         200 => write_buffer.write_fmt(format_args!("RZ\n")).expect("Failed to write to file"),
         201 => write_buffer.write_fmt(format_args!("RET\n")).expect("Failed to write to file"),
         202 => {
-            write_buffer.write_fmt(format_args!("JZ {:02x} {:02x}\n", buffer[pc + 1], buffer[pc + 2])).expect("Failed to write to file");
+            write_buffer.write_fmt(format_args!("JZ {:02x} {:02x}\n", buffer[program_counter + 1], buffer[program_counter + 2])).expect("Failed to write to file");
             read_bytes = 3;
         },
         204 => {
-            write_buffer.write_fmt(format_args!("CZ {:02x} {:02x}\n", buffer[pc + 1], buffer[pc + 2])).expect("Failed to write to file");
+            write_buffer.write_fmt(format_args!("CZ {:02x} {:02x}\n", buffer[program_counter + 1], buffer[program_counter + 2])).expect("Failed to write to file");
             read_bytes = 3;
         },
         205 => {
-            write_buffer.write_fmt(format_args!("CALL {:02x} {:02x}\n", buffer[pc + 1], buffer[pc + 2])).expect("Failed to write to file");
+            write_buffer.write_fmt(format_args!("CALL {:02x} {:02x}\n", buffer[program_counter + 1], buffer[program_counter + 2])).expect("Failed to write to file");
             read_bytes = 3;
         },
         206 => {
-            write_buffer.write_fmt(format_args!("ACI {:02x}\n", buffer[pc + 1])).expect("Failed to write to file");
+            write_buffer.write_fmt(format_args!("ACI {:02x}\n", buffer[program_counter + 1])).expect("Failed to write to file");
             read_bytes = 2;
         },
         207 => write_buffer.write_fmt(format_args!("RST 1\n")).expect("Failed to write to file"),
         208 => write_buffer.write_fmt(format_args!("RNC\n")).expect("Failed to write to file"),
         209 => write_buffer.write_fmt(format_args!("POP D\n")).expect("Failed to write to file"),
         210 => {
-            write_buffer.write_fmt(format_args!("JNC {:02x} {:02x}\n", buffer[pc + 1], buffer[pc + 2])).expect("Failed to write to file");
+            write_buffer.write_fmt(format_args!("JNC {:02x} {:02x}\n", buffer[program_counter + 1], buffer[program_counter + 2])).expect("Failed to write to file");
             read_bytes = 3;
         },
         211 => {
-            write_buffer.write_fmt(format_args!("OUT {:02x}\n", buffer[pc + 1])).expect("Failed to write to file");
+            write_buffer.write_fmt(format_args!("OUT {:02x}\n", buffer[program_counter + 1])).expect("Failed to write to file");
             read_bytes = 2;
         },
         212 => {
-            write_buffer.write_fmt(format_args!("CNC {:02x} {:02x}\n", buffer[pc + 1], buffer[pc + 2])).expect("Failed to write to file");
+            write_buffer.write_fmt(format_args!("CNC {:02x} {:02x}\n", buffer[program_counter + 1], buffer[program_counter + 2])).expect("Failed to write to file");
             read_bytes = 3;
         },
         213 => write_buffer.write_fmt(format_args!("PUSH D\n")).expect("Failed to write to file"),
         214 => {
-            write_buffer.write_fmt(format_args!("SUI {:02x}\n", buffer[pc + 1])).expect("Failed to write to file");
+            write_buffer.write_fmt(format_args!("SUI {:02x}\n", buffer[program_counter + 1])).expect("Failed to write to file");
             read_bytes = 2;
         },
         215 => write_buffer.write_fmt(format_args!("RST 2\n")).expect("Failed to write to file"),
         216 => write_buffer.write_fmt(format_args!("RC\n")).expect("Failed to write to file"),
         218 => {
-            write_buffer.write_fmt(format_args!("JC {:02x} {:02x}\n", buffer[pc + 1], buffer[pc + 2])).expect("Failed to write to file");
+            write_buffer.write_fmt(format_args!("JC {:02x} {:02x}\n", buffer[program_counter + 1], buffer[program_counter + 2])).expect("Failed to write to file");
             read_bytes = 3;
         },
         219 => {
-            write_buffer.write_fmt(format_args!("IN {:02x}\n", buffer[pc + 1])).expect("Failed to write to file");
+            write_buffer.write_fmt(format_args!("IN {:02x}\n", buffer[program_counter + 1])).expect("Failed to write to file");
             read_bytes = 2;
         },
         220 => {
-            write_buffer.write_fmt(format_args!("CC {:02x} {:02x}\n", buffer[pc + 1], buffer[pc + 2])).expect("Failed to write to file");
+            write_buffer.write_fmt(format_args!("CC {:02x} {:02x}\n", buffer[program_counter + 1], buffer[program_counter + 2])).expect("Failed to write to file");
             read_bytes = 3;
         },
         222 => {
-            write_buffer.write_fmt(format_args!("SBI {:02x}\n", buffer[pc + 1])).expect("Failed to write to file");
+            write_buffer.write_fmt(format_args!("SBI {:02x}\n", buffer[program_counter + 1])).expect("Failed to write to file");
             read_bytes = 2;
         },
         223 => write_buffer.write_fmt(format_args!("RST 3\n")).expect("Failed to write to file"),
         224 => write_buffer.write_fmt(format_args!("RPO\n")).expect("Failed to write to file"),
         225 => write_buffer.write_fmt(format_args!("POP H\n")).expect("Failed to write to file"),
         226 => {
-            write_buffer.write_fmt(format_args!("JPO {:02x} {:02x}\n", buffer[pc + 1], buffer[pc + 2])).expect("Failed to write to file");
+            write_buffer.write_fmt(format_args!("JPO {:02x} {:02x}\n", buffer[program_counter + 1], buffer[program_counter + 2])).expect("Failed to write to file");
             read_bytes = 3;
         },
         227 => write_buffer.write_fmt(format_args!("XTHL\n")).expect("Failed to write to file"),
         228 => {
-            write_buffer.write_fmt(format_args!("CPO {:02x} {:02x}\n", buffer[pc + 1], buffer[pc + 2])).expect("Failed to write to file");
+            write_buffer.write_fmt(format_args!("CPO {:02x} {:02x}\n", buffer[program_counter + 1], buffer[program_counter + 2])).expect("Failed to write to file");
             read_bytes = 3;
         },
         229 => write_buffer.write_fmt(format_args!("PUSH H\n")).expect("Failed to write to file"),
         230 => {
-            write_buffer.write_fmt(format_args!("ANI {:02x}\n", buffer[pc + 1])).expect("Failed to write to file");
+            write_buffer.write_fmt(format_args!("ANI {:02x}\n", buffer[program_counter + 1])).expect("Failed to write to file");
             read_bytes = 2;
         },
         231 => write_buffer.write_fmt(format_args!("RST 4\n")).expect("Failed to write to file"),
         232 => write_buffer.write_fmt(format_args!("RPE\n")).expect("Failed to write to file"),
         233 => write_buffer.write_fmt(format_args!("PCHL\n")).expect("Failed to write to file"),
         234 => {
-            write_buffer.write_fmt(format_args!("JPE {:02x} {:02x}\n", buffer[pc + 1], buffer[pc + 2])).expect("Failed to write to file");
+            write_buffer.write_fmt(format_args!("JPE {:02x} {:02x}\n", buffer[program_counter + 1], buffer[program_counter + 2])).expect("Failed to write to file");
             read_bytes = 3;
         },
         235 => write_buffer.write_fmt(format_args!("XCHG\n")).expect("Failed to write to file"),
         236 => {
-            write_buffer.write_fmt(format_args!("CPE {:02x} {:02x}\n", buffer[pc + 1], buffer[pc + 2])).expect("Failed to write to file");
+            write_buffer.write_fmt(format_args!("CPE {:02x} {:02x}\n", buffer[program_counter + 1], buffer[program_counter + 2])).expect("Failed to write to file");
             read_bytes = 3;
         },
         238 => {
-            write_buffer.write_fmt(format_args!("XRI {:02x}\n", buffer[pc + 1])).expect("Failed to write to file");
+            write_buffer.write_fmt(format_args!("XRI {:02x}\n", buffer[program_counter + 1])).expect("Failed to write to file");
             read_bytes = 2;
         },
         239 => write_buffer.write_fmt(format_args!("RST 5\n")).expect("Failed to write to file"),
         240 => write_buffer.write_fmt(format_args!("RP\n")).expect("Failed to write to file"),
         241 => write_buffer.write_fmt(format_args!("POP PSW\n")).expect("Failed to write to file"),
         242 => {
-            write_buffer.write_fmt(format_args!("JP {:02x} {:02x}\n", buffer[pc + 1], buffer[pc + 2])).expect("Failed to write to file");
+            write_buffer.write_fmt(format_args!("JP {:02x} {:02x}\n", buffer[program_counter + 1], buffer[program_counter + 2])).expect("Failed to write to file");
             read_bytes = 3;
         },
         243 => write_buffer.write_fmt(format_args!("DI\n")).expect("Failed to write to file"),
         244 => {
-            write_buffer.write_fmt(format_args!("CP {:02x} {:02x}\n", buffer[pc + 1], buffer[pc + 2])).expect("Failed to write to file");
+            write_buffer.write_fmt(format_args!("CP {:02x} {:02x}\n", buffer[program_counter + 1], buffer[program_counter + 2])).expect("Failed to write to file");
             read_bytes = 3;
         },
         245 => write_buffer.write_fmt(format_args!("PUSH PSW\n")).expect("Failed to write to file"),
         246 => {
-            write_buffer.write_fmt(format_args!("ORI {:02x}\n", buffer[pc + 1])).expect("Failed to write to file");
+            write_buffer.write_fmt(format_args!("ORI {:02x}\n", buffer[program_counter + 1])).expect("Failed to write to file");
             read_bytes = 2;
         },
         247 => write_buffer.write_fmt(format_args!("RST 6\n")).expect("Failed to write to file"),
         248 => write_buffer.write_fmt(format_args!("RM\n")).expect("Failed to write to file"),
         249 => write_buffer.write_fmt(format_args!("SPHL\n")).expect("Failed to write to file"),
         250 => {
-            write_buffer.write_fmt(format_args!("JM {:02x} {:02x}\n", buffer[pc + 1], buffer[pc + 2])).expect("Failed to write to file");
+            write_buffer.write_fmt(format_args!("JM {:02x} {:02x}\n", buffer[program_counter + 1], buffer[program_counter + 2])).expect("Failed to write to file");
             read_bytes = 3;
         },
         251 => write_buffer.write_fmt(format_args!("EI\n")).expect("Failed to write to file"),
         252 => {
-            write_buffer.write_fmt(format_args!("CM {:02x} {:02x}\n", buffer[pc + 1], buffer[pc + 2])).expect("Failed to write to file");
+            write_buffer.write_fmt(format_args!("CM {:02x} {:02x}\n", buffer[program_counter + 1], buffer[program_counter + 2])).expect("Failed to write to file");
             read_bytes = 3;
         },
         254 => {
-            write_buffer.write_fmt(format_args!("CPI {:02x}\n", buffer[pc + 1])).expect("Failed to write to file");
+            write_buffer.write_fmt(format_args!("CPI {:02x}\n", buffer[program_counter + 1])).expect("Failed to write to file");
             read_bytes = 2;
         },
         255 => write_buffer.write_fmt(format_args!("RST 7\n")).expect("Failed to write to file"),        
