@@ -1,3 +1,5 @@
+# Retrieved opcodes.txt from http://www.emulator101.com/reference/8080-by-opcode.html
+
 with open("opcodes.txt", "r") as file:
 
     data = file.readlines()
