@@ -4,7 +4,7 @@ use std::io::{BufWriter, Write};
 
 fn main() {
 
-    let mut file = File::open("invaders/invaders.h").expect("File not found");
+    let mut file = File::open("invaders/invaders").expect("File not found");
 
     let mut buffer = vec![];
 

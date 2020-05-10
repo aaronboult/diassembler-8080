@@ -32,7 +32,7 @@ for i in range(len(data)):
         
         else:
 
-            println = "{:06x} " + data[i][1].replace(lastRegister, "{:02x} {:02x}")
+            println = "{:06x} " + data[i][1].replace(lastRegister, "{:02x}{:02x}")
 
             if len(data[i]) == 4:
 
