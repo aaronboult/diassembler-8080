@@ -30,14 +30,14 @@ fn main() {
 
 }
 
-fn check_opcode_8080(program_counter: usize, buffer: &Vec<u8>, write_buffer: &mut BufWriter<File>) -> usize {
+pub fn check_opcode_8080(program_counter: usize, buffer: &Vec<u8>, write_buffer: &mut BufWriter<File>) -> usize {
     
     let mut read_bytes = 1;
     
     match buffer[program_counter] {
         0 => write_buffer.write_fmt(format_args!("{:06x} NOP\n", program_counter)).expect("Failed to write to file"),
         1 => {
-            write_buffer.write_fmt(format_args!("{:06x} LXI B {:02x} {:02x}\n", program_counter, buffer[program_counter + 2], buffer[program_counter + 1])).expect("Failed to write to file");
+            write_buffer.write_fmt(format_args!("{:06x} LXI B {:02x}{:02x}\n", program_counter, buffer[program_counter + 1], buffer[program_counter + 2])).expect("Failed to write to file");
             read_bytes = 3;
         },
         2 => write_buffer.write_fmt(format_args!("{:06x} STAX B\n", program_counter)).expect("Failed to write to file"),
@@ -60,7 +60,7 @@ fn check_opcode_8080(program_counter: usize, buffer: &Vec<u8>, write_buffer: &mu
         },
         15 => write_buffer.write_fmt(format_args!("{:06x} RRC\n", program_counter)).expect("Failed to write to file"),
         17 => {
-            write_buffer.write_fmt(format_args!("{:06x} LXI D {:02x} {:02x}\n", program_counter, buffer[program_counter + 2], buffer[program_counter + 1])).expect("Failed to write to file");
+            write_buffer.write_fmt(format_args!("{:06x} LXI D {:02x}{:02x}\n", program_counter, buffer[program_counter + 1], buffer[program_counter + 2])).expect("Failed to write to file");
             read_bytes = 3;
         },
         18 => write_buffer.write_fmt(format_args!("{:06x} STAX D\n", program_counter)).expect("Failed to write to file"),
@@ -83,11 +83,11 @@ fn check_opcode_8080(program_counter: usize, buffer: &Vec<u8>, write_buffer: &mu
         },
         31 => write_buffer.write_fmt(format_args!("{:06x} RAR\n", program_counter)).expect("Failed to write to file"),
         33 => {
-            write_buffer.write_fmt(format_args!("{:06x} LXI H {:02x} {:02x}\n", program_counter, buffer[program_counter + 2], buffer[program_counter + 1])).expect("Failed to write to file");
+            write_buffer.write_fmt(format_args!("{:06x} LXI H {:02x}{:02x}\n", program_counter, buffer[program_counter + 1], buffer[program_counter + 2])).expect("Failed to write to file");
             read_bytes = 3;
         },
         34 => {
-            write_buffer.write_fmt(format_args!("{:06x} SHLD {:02x} {:02x}\n", program_counter, buffer[program_counter + 2], buffer[program_counter + 1])).expect("Failed to write to file");
+            write_buffer.write_fmt(format_args!("{:06x} SHLD {:02x}{:02x}\n", program_counter, buffer[program_counter + 1], buffer[program_counter + 2])).expect("Failed to write to file");
             read_bytes = 3;
         },
         35 => write_buffer.write_fmt(format_args!("{:06x} INX H\n", program_counter)).expect("Failed to write to file"),
@@ -100,7 +100,7 @@ fn check_opcode_8080(program_counter: usize, buffer: &Vec<u8>, write_buffer: &mu
         39 => write_buffer.write_fmt(format_args!("{:06x} DAA\n", program_counter)).expect("Failed to write to file"),
         41 => write_buffer.write_fmt(format_args!("{:06x} DAD H\n", program_counter)).expect("Failed to write to file"),
         42 => {
-            write_buffer.write_fmt(format_args!("{:06x} LHLD {:02x} {:02x}\n", program_counter, buffer[program_counter + 2], buffer[program_counter + 1])).expect("Failed to write to file");
+            write_buffer.write_fmt(format_args!("{:06x} LHLD {:02x}{:02x}\n", program_counter, buffer[program_counter + 1], buffer[program_counter + 2])).expect("Failed to write to file");
             read_bytes = 3;
         },
         43 => write_buffer.write_fmt(format_args!("{:06x} DCX H\n", program_counter)).expect("Failed to write to file"),
@@ -112,11 +112,11 @@ fn check_opcode_8080(program_counter: usize, buffer: &Vec<u8>, write_buffer: &mu
         },
         47 => write_buffer.write_fmt(format_args!("{:06x} CMA\n", program_counter)).expect("Failed to write to file"),
         49 => {
-            write_buffer.write_fmt(format_args!("{:06x} LXI SP  {:02x} {:02x}\n", program_counter, buffer[program_counter + 2], buffer[program_counter + 1])).expect("Failed to write to file");
+            write_buffer.write_fmt(format_args!("{:06x} LXI SP  {:02x}{:02x}\n", program_counter, buffer[program_counter + 1], buffer[program_counter + 2])).expect("Failed to write to file");
             read_bytes = 3;
         },
         50 => {
-            write_buffer.write_fmt(format_args!("{:06x} STA {:02x} {:02x}\n", program_counter, buffer[program_counter + 2], buffer[program_counter + 1])).expect("Failed to write to file");
+            write_buffer.write_fmt(format_args!("{:06x} STA {:02x}{:02x}\n", program_counter, buffer[program_counter + 1], buffer[program_counter + 2])).expect("Failed to write to file");
             read_bytes = 3;
         },
         51 => write_buffer.write_fmt(format_args!("{:06x} INX SP\n", program_counter)).expect("Failed to write to file"),
@@ -129,7 +129,7 @@ fn check_opcode_8080(program_counter: usize, buffer: &Vec<u8>, write_buffer: &mu
         55 => write_buffer.write_fmt(format_args!("{:06x} STC\n", program_counter)).expect("Failed to write to file"),
         57 => write_buffer.write_fmt(format_args!("{:06x} DAD SP\n", program_counter)).expect("Failed to write to file"),
         58 => {
-            write_buffer.write_fmt(format_args!("{:06x} LDA {:02x} {:02x}\n", program_counter, buffer[program_counter + 2], buffer[program_counter + 1])).expect("Failed to write to file");
+            write_buffer.write_fmt(format_args!("{:06x} LDA {:02x}{:02x}\n", program_counter, buffer[program_counter + 1], buffer[program_counter + 2])).expect("Failed to write to file");
             read_bytes = 3;
         },
         59 => write_buffer.write_fmt(format_args!("{:06x} DCX SP\n", program_counter)).expect("Failed to write to file"),
@@ -271,15 +271,15 @@ fn check_opcode_8080(program_counter: usize, buffer: &Vec<u8>, write_buffer: &mu
         192 => write_buffer.write_fmt(format_args!("{:06x} RNZ\n", program_counter)).expect("Failed to write to file"),
         193 => write_buffer.write_fmt(format_args!("{:06x} POP B\n", program_counter)).expect("Failed to write to file"),
         194 => {
-            write_buffer.write_fmt(format_args!("{:06x} JNZ {:02x} {:02x}\n", program_counter, buffer[program_counter + 2], buffer[program_counter + 1])).expect("Failed to write to file");
+            write_buffer.write_fmt(format_args!("{:06x} JNZ {:02x}{:02x}\n", program_counter, buffer[program_counter + 1], buffer[program_counter + 2])).expect("Failed to write to file");
             read_bytes = 3;
         },
         195 => {
-            write_buffer.write_fmt(format_args!("{:06x} JMP {:02x} {:02x}\n", program_counter, buffer[program_counter + 2], buffer[program_counter + 1])).expect("Failed to write to file");
+            write_buffer.write_fmt(format_args!("{:06x} JMP {:02x}{:02x}\n", program_counter, buffer[program_counter + 1], buffer[program_counter + 2])).expect("Failed to write to file");
             read_bytes = 3;
         },
         196 => {
-            write_buffer.write_fmt(format_args!("{:06x} CNZ {:02x} {:02x}\n", program_counter, buffer[program_counter + 2], buffer[program_counter + 1])).expect("Failed to write to file");
+            write_buffer.write_fmt(format_args!("{:06x} CNZ {:02x}{:02x}\n", program_counter, buffer[program_counter + 1], buffer[program_counter + 2])).expect("Failed to write to file");
             read_bytes = 3;
         },
         197 => write_buffer.write_fmt(format_args!("{:06x} PUSH B\n", program_counter)).expect("Failed to write to file"),
@@ -291,15 +291,15 @@ fn check_opcode_8080(program_counter: usize, buffer: &Vec<u8>, write_buffer: &mu
         200 => write_buffer.write_fmt(format_args!("{:06x} RZ\n", program_counter)).expect("Failed to write to file"),
         201 => write_buffer.write_fmt(format_args!("{:06x} RET\n", program_counter)).expect("Failed to write to file"),
         202 => {
-            write_buffer.write_fmt(format_args!("{:06x} JZ {:02x} {:02x}\n", program_counter, buffer[program_counter + 2], buffer[program_counter + 1])).expect("Failed to write to file");
+            write_buffer.write_fmt(format_args!("{:06x} JZ {:02x}{:02x}\n", program_counter, buffer[program_counter + 1], buffer[program_counter + 2])).expect("Failed to write to file");
             read_bytes = 3;
         },
         204 => {
-            write_buffer.write_fmt(format_args!("{:06x} CZ {:02x} {:02x}\n", program_counter, buffer[program_counter + 2], buffer[program_counter + 1])).expect("Failed to write to file");
+            write_buffer.write_fmt(format_args!("{:06x} CZ {:02x}{:02x}\n", program_counter, buffer[program_counter + 1], buffer[program_counter + 2])).expect("Failed to write to file");
             read_bytes = 3;
         },
         205 => {
-            write_buffer.write_fmt(format_args!("{:06x} CALL {:02x} {:02x}\n", program_counter, buffer[program_counter + 2], buffer[program_counter + 1])).expect("Failed to write to file");
+            write_buffer.write_fmt(format_args!("{:06x} CALL {:02x}{:02x}\n", program_counter, buffer[program_counter + 1], buffer[program_counter + 2])).expect("Failed to write to file");
             read_bytes = 3;
         },
         206 => {
@@ -310,7 +310,7 @@ fn check_opcode_8080(program_counter: usize, buffer: &Vec<u8>, write_buffer: &mu
         208 => write_buffer.write_fmt(format_args!("{:06x} RNC\n", program_counter)).expect("Failed to write to file"),
         209 => write_buffer.write_fmt(format_args!("{:06x} POP D\n", program_counter)).expect("Failed to write to file"),
         210 => {
-            write_buffer.write_fmt(format_args!("{:06x} JNC {:02x} {:02x}\n", program_counter, buffer[program_counter + 2], buffer[program_counter + 1])).expect("Failed to write to file");
+            write_buffer.write_fmt(format_args!("{:06x} JNC {:02x}{:02x}\n", program_counter, buffer[program_counter + 1], buffer[program_counter + 2])).expect("Failed to write to file");
             read_bytes = 3;
         },
         211 => {
@@ -318,7 +318,7 @@ fn check_opcode_8080(program_counter: usize, buffer: &Vec<u8>, write_buffer: &mu
             read_bytes = 2;
         },
         212 => {
-            write_buffer.write_fmt(format_args!("{:06x} CNC {:02x} {:02x}\n", program_counter, buffer[program_counter + 2], buffer[program_counter + 1])).expect("Failed to write to file");
+            write_buffer.write_fmt(format_args!("{:06x} CNC {:02x}{:02x}\n", program_counter, buffer[program_counter + 1], buffer[program_counter + 2])).expect("Failed to write to file");
             read_bytes = 3;
         },
         213 => write_buffer.write_fmt(format_args!("{:06x} PUSH D\n", program_counter)).expect("Failed to write to file"),
@@ -329,7 +329,7 @@ fn check_opcode_8080(program_counter: usize, buffer: &Vec<u8>, write_buffer: &mu
         215 => write_buffer.write_fmt(format_args!("{:06x} RST 2\n", program_counter)).expect("Failed to write to file"),
         216 => write_buffer.write_fmt(format_args!("{:06x} RC\n", program_counter)).expect("Failed to write to file"),
         218 => {
-            write_buffer.write_fmt(format_args!("{:06x} JC {:02x} {:02x}\n", program_counter, buffer[program_counter + 2], buffer[program_counter + 1])).expect("Failed to write to file");
+            write_buffer.write_fmt(format_args!("{:06x} JC {:02x}{:02x}\n", program_counter, buffer[program_counter + 1], buffer[program_counter + 2])).expect("Failed to write to file");
             read_bytes = 3;
         },
         219 => {
@@ -337,7 +337,7 @@ fn check_opcode_8080(program_counter: usize, buffer: &Vec<u8>, write_buffer: &mu
             read_bytes = 2;
         },
         220 => {
-            write_buffer.write_fmt(format_args!("{:06x} CC {:02x} {:02x}\n", program_counter, buffer[program_counter + 2], buffer[program_counter + 1])).expect("Failed to write to file");
+            write_buffer.write_fmt(format_args!("{:06x} CC {:02x}{:02x}\n", program_counter, buffer[program_counter + 1], buffer[program_counter + 2])).expect("Failed to write to file");
             read_bytes = 3;
         },
         222 => {
@@ -348,12 +348,12 @@ fn check_opcode_8080(program_counter: usize, buffer: &Vec<u8>, write_buffer: &mu
         224 => write_buffer.write_fmt(format_args!("{:06x} RPO\n", program_counter)).expect("Failed to write to file"),
         225 => write_buffer.write_fmt(format_args!("{:06x} POP H\n", program_counter)).expect("Failed to write to file"),
         226 => {
-            write_buffer.write_fmt(format_args!("{:06x} JPO {:02x} {:02x}\n", program_counter, buffer[program_counter + 2], buffer[program_counter + 1])).expect("Failed to write to file");
+            write_buffer.write_fmt(format_args!("{:06x} JPO {:02x}{:02x}\n", program_counter, buffer[program_counter + 1], buffer[program_counter + 2])).expect("Failed to write to file");
             read_bytes = 3;
         },
         227 => write_buffer.write_fmt(format_args!("{:06x} XTHL\n", program_counter)).expect("Failed to write to file"),
         228 => {
-            write_buffer.write_fmt(format_args!("{:06x} CPO {:02x} {:02x}\n", program_counter, buffer[program_counter + 2], buffer[program_counter + 1])).expect("Failed to write to file");
+            write_buffer.write_fmt(format_args!("{:06x} CPO {:02x}{:02x}\n", program_counter, buffer[program_counter + 1], buffer[program_counter + 2])).expect("Failed to write to file");
             read_bytes = 3;
         },
         229 => write_buffer.write_fmt(format_args!("{:06x} PUSH H\n", program_counter)).expect("Failed to write to file"),
@@ -365,12 +365,12 @@ fn check_opcode_8080(program_counter: usize, buffer: &Vec<u8>, write_buffer: &mu
         232 => write_buffer.write_fmt(format_args!("{:06x} RPE\n", program_counter)).expect("Failed to write to file"),
         233 => write_buffer.write_fmt(format_args!("{:06x} PCHL\n", program_counter)).expect("Failed to write to file"),
         234 => {
-            write_buffer.write_fmt(format_args!("{:06x} JPE {:02x} {:02x}\n", program_counter, buffer[program_counter + 2], buffer[program_counter + 1])).expect("Failed to write to file");
+            write_buffer.write_fmt(format_args!("{:06x} JPE {:02x}{:02x}\n", program_counter, buffer[program_counter + 1], buffer[program_counter + 2])).expect("Failed to write to file");
             read_bytes = 3;
         },
         235 => write_buffer.write_fmt(format_args!("{:06x} XCHG\n", program_counter)).expect("Failed to write to file"),
         236 => {
-            write_buffer.write_fmt(format_args!("{:06x} CPE {:02x} {:02x}\n", program_counter, buffer[program_counter + 2], buffer[program_counter + 1])).expect("Failed to write to file");
+            write_buffer.write_fmt(format_args!("{:06x} CPE {:02x}{:02x}\n", program_counter, buffer[program_counter + 1], buffer[program_counter + 2])).expect("Failed to write to file");
             read_bytes = 3;
         },
         238 => {
@@ -381,12 +381,12 @@ fn check_opcode_8080(program_counter: usize, buffer: &Vec<u8>, write_buffer: &mu
         240 => write_buffer.write_fmt(format_args!("{:06x} RP\n", program_counter)).expect("Failed to write to file"),
         241 => write_buffer.write_fmt(format_args!("{:06x} POP PSW\n", program_counter)).expect("Failed to write to file"),
         242 => {
-            write_buffer.write_fmt(format_args!("{:06x} JP {:02x} {:02x}\n", program_counter, buffer[program_counter + 2], buffer[program_counter + 1])).expect("Failed to write to file");
+            write_buffer.write_fmt(format_args!("{:06x} JP {:02x}{:02x}\n", program_counter, buffer[program_counter + 1], buffer[program_counter + 2])).expect("Failed to write to file");
             read_bytes = 3;
         },
         243 => write_buffer.write_fmt(format_args!("{:06x} DI\n", program_counter)).expect("Failed to write to file"),
         244 => {
-            write_buffer.write_fmt(format_args!("{:06x} CP {:02x} {:02x}\n", program_counter, buffer[program_counter + 2], buffer[program_counter + 1])).expect("Failed to write to file");
+            write_buffer.write_fmt(format_args!("{:06x} CP {:02x}{:02x}\n", program_counter, buffer[program_counter + 1], buffer[program_counter + 2])).expect("Failed to write to file");
             read_bytes = 3;
         },
         245 => write_buffer.write_fmt(format_args!("{:06x} PUSH PSW\n", program_counter)).expect("Failed to write to file"),
@@ -398,19 +398,19 @@ fn check_opcode_8080(program_counter: usize, buffer: &Vec<u8>, write_buffer: &mu
         248 => write_buffer.write_fmt(format_args!("{:06x} RM\n", program_counter)).expect("Failed to write to file"),
         249 => write_buffer.write_fmt(format_args!("{:06x} SPHL\n", program_counter)).expect("Failed to write to file"),
         250 => {
-            write_buffer.write_fmt(format_args!("{:06x} JM {:02x} {:02x}\n", program_counter, buffer[program_counter + 2], buffer[program_counter + 1])).expect("Failed to write to file");
+            write_buffer.write_fmt(format_args!("{:06x} JM {:02x}{:02x}\n", program_counter, buffer[program_counter + 1], buffer[program_counter + 2])).expect("Failed to write to file");
             read_bytes = 3;
         },
         251 => write_buffer.write_fmt(format_args!("{:06x} EI\n", program_counter)).expect("Failed to write to file"),
         252 => {
-            write_buffer.write_fmt(format_args!("{:06x} CM {:02x} {:02x}\n", program_counter, buffer[program_counter + 2], buffer[program_counter + 1])).expect("Failed to write to file");
+            write_buffer.write_fmt(format_args!("{:06x} CM {:02x}{:02x}\n", program_counter, buffer[program_counter + 1], buffer[program_counter + 2])).expect("Failed to write to file");
             read_bytes = 3;
         },
         254 => {
             write_buffer.write_fmt(format_args!("{:06x} CPI {:02x}\n", program_counter, buffer[program_counter + 1])).expect("Failed to write to file");
             read_bytes = 2;
         },
-        255 => write_buffer.write_fmt(format_args!("{:06x} RST 7\n", program_counter)).expect("Failed to write to file"),
+        255 => write_buffer.write_fmt(format_args!("{:06x} RST 7\n", program_counter)).expect("Failed to write to file"),        
         
 		_   => println!("NOP"),
     }

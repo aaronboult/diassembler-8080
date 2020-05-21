@@ -32,23 +32,7 @@ for i in range(len(data)):
         
         else:
 
-            println = "{:06x} " + data[i][1].replace(lastRegister, "{:02x}{:02x}")
-
-            if len(data[i]) == 4:
-
-                opcodeLocs = data[i][3].split()
-
-                if opcodeLocs.index("byte2") < opcodeLocs.index("byte3"): # If byte2 comes before byte3
-
-                    println += "\\n\", program_counter, buffer[program_counter + 1], buffer[program_counter + 2]"
-                
-                else:
-
-                    println += "\\n\", program_counter, buffer[program_counter + 2], buffer[program_counter + 1]"
-            
-            else:
-
-                println += "\\n\", program_counter, buffer[program_counter + 2], buffer[program_counter + 1]"
+            println = "{:06x} " + data[i][1].replace(lastRegister, "{:02x}{:02x}") + "\\n\", program_counter, buffer[program_counter + 1], buffer[program_counter + 2]"
 
         output += f"{data[i][0]} => {{\n\twrite_buffer.write_fmt(format_args!(\"{println})).expect(\"Failed to write to file\");\n\tread_bytes = {int(data[i][2])};\n}},\n"
 
