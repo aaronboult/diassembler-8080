@@ -20,7 +20,7 @@ for i in range(len(data)):
 
     if data[i][2] == "1":
 
-        output += f"{data[i][0]} => write_buffer.write_fmt(format_args!(\"0x{{:02x}} {data[i][1]}\\n\", buffer[program_counter])).expect(\"Failed to write to file\"),\n"
+        output += f"{data[i][0]} => write_buffer.write_fmt(format_args!(\"0x{{:04x}}: 0x{{:02x}} {data[i][1]}\\n\", program_counter, buffer[program_counter])).expect(\"Failed to write to file\"),\n"
     
     else:
 
@@ -28,11 +28,11 @@ for i in range(len(data)):
 
         if data[i][2] == "2":
 
-            println = "0x{:02x} " + data[i][1].replace(lastRegister, "{:02x}") + "\\n\", buffer[program_counter], buffer[program_counter + 1]"
+            println = "0x{:04x}: 0x{:02x} " + data[i][1].replace(lastRegister, "{:02x}") + "\\n\", program_counter, buffer[program_counter], buffer[program_counter + 1]"
         
         else:
 
-            println = "0x{:02x} " + data[i][1].replace(lastRegister, "{:02x}{:02x}") + "\\n\", buffer[program_counter], buffer[program_counter + 1], buffer[program_counter + 2]"
+            println = "0x{:04x}: 0x{:02x} " + data[i][1].replace(lastRegister, "{:02x}{:02x}") + "\\n\", program_counter, buffer[program_counter], buffer[program_counter + 1], buffer[program_counter + 2]"
 
         output += f"{data[i][0]} => {{\n\twrite_buffer.write_fmt(format_args!(\"{println})).expect(\"Failed to write to file\");\n\tread_bytes = {int(data[i][2])};\n}},\n"
 
